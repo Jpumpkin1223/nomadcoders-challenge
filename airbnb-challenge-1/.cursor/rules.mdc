@@ -1,0 +1,3 @@
+# Cursor Workspace Rules
+
+- Run every Python command and manage all packages through `uv`.
