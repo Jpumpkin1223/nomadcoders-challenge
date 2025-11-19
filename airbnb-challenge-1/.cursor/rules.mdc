@@ -1,3 +1,13 @@
 # Cursor Workspace Rules
 
 - Run every Python command and manage all packages through `uv`.
+
+# Pull Request 규칙
+- 모든 Pull Request는 GitHub CLI (`gh`)를 사용하여 생성해야 합니다.
+- GitKraken MCP 도구의 `pull_request_create` 함수는 사용하지 않습니다.
+- PR 생성 시 `gh pr create` 명령어를 사용합니다.
+
+# PR 생성 예시
+```bash
+gh pr create --base main --head <브랜치명> --title "<제목>" --body "<본문>"
+```
