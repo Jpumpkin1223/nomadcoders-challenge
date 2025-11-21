@@ -13,4 +13,3 @@ class TweetSerializer(serializers.ModelSerializer):
         model = Tweet
         fields = ["id", "payload", "user", "username", "created_at", "updated_at"]
         read_only_fields = ["id", "user", "username", "created_at", "updated_at"]
-
