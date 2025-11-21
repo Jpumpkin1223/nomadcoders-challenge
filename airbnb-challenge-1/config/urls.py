@@ -22,10 +22,10 @@ from tweets import views
 
 urlpatterns = [
     path("", views.tweet_list, name="tweet_list"),
-    path("api/v1/tweets", views.api_tweet_list, name="api_tweet_list"),
+    path("api/v1/tweets", views.TweetListAPIView.as_view(), name="api_tweet_list"),
     path(
         "api/v1/users/<int:user_id>/tweets",
-        views.api_user_tweet_list,
+        views.UserTweetListAPIView.as_view(),
         name="api_user_tweet_list",
     ),
     path("admin/", admin.site.urls),
