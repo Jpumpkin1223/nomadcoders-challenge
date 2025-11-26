@@ -32,7 +32,7 @@ urlpatterns = [
         views.TweetDetailAPIView.as_view(),
         name="api_tweet_detail",
     ),
-    path("api/v1/users", views.UserListAPIView.as_view(), name="api_user_list"),
+    path("api/v1/users", views.UserListCreateAPIView.as_view(), name="api_user_list"),
     path(
         "api/v1/users/<int:pk>",
         views.UserDetailAPIView.as_view(),

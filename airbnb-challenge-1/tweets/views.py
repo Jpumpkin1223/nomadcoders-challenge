@@ -2,12 +2,12 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Tweet
-from .serializers import TweetSerializer, UserSerializer
+from .serializers import TweetSerializer, UserCreateSerializer, UserSerializer
 
 
 def tweet_list(request):
@@ -86,16 +86,27 @@ class TweetDetailAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserListAPIView(APIView):
-    """모든 사용자 목록"""
+class UserListCreateAPIView(APIView):
+    """GET: 사용자 목록 / POST: 회원가입"""
 
     authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "로그인이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED
+            )
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = UserCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailAPIView(APIView):
