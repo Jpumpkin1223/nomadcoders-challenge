@@ -1,3 +1,4 @@
+from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render
 from rest_framework import status
@@ -8,6 +9,7 @@ from rest_framework.views import APIView
 
 from .models import Tweet
 from .serializers import (
+    LoginSerializer,
     PasswordUpdateSerializer,
     TweetSerializer,
     UserCreateSerializer,
@@ -155,3 +157,29 @@ class UserPasswordUpdateAPIView(APIView):
                 {"detail": "비밀번호가 변경되었습니다."}, status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLoginAPIView(APIView):
+    """세션 기반 로그인"""
+
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
+            login(request, user)
+            return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLogoutAPIView(APIView):
+    """세션 기반 로그아웃"""
+
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        logout(request)
+        return Response({"detail": "로그아웃되었습니다."}, status=status.HTTP_200_OK)

@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -86,3 +87,19 @@ class PasswordUpdateSerializer(serializers.Serializer):
         user.set_password(new_password)
         user.save()
         return user
+
+
+class LoginSerializer(serializers.Serializer):
+    """세션 로그인을 위한 Serializer"""
+
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        username = attrs.get("username")
+        password = attrs.get("password")
+        user = authenticate(username=username, password=password)
+        if not user:
+            raise serializers.ValidationError("아이디 또는 비밀번호가 올바르지 않습니다.")
+        attrs["user"] = user
+        return attrs

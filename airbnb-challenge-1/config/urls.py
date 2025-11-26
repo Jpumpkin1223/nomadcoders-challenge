@@ -44,6 +44,16 @@ urlpatterns = [
         name="api_user_password_update",
     ),
     path(
+        "api/v1/users/login",
+        views.UserLoginAPIView.as_view(),
+        name="api_user_login",
+    ),
+    path(
+        "api/v1/users/logout",
+        views.UserLogoutAPIView.as_view(),
+        name="api_user_logout",
+    ),
+    path(
         "api/v1/users/<int:pk>/tweets",
         views.UserTweetsAPIView.as_view(),
         name="api_user_tweet_list",
