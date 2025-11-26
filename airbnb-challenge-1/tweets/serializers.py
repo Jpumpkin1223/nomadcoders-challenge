@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import Tweet
@@ -22,12 +21,3 @@ class TweetSerializer(serializers.ModelSerializer):
         if user is None or not user.is_authenticated:
             raise serializers.ValidationError("인증된 사용자만 트윗을 작성할 수 있습니다.")
         return Tweet.objects.create(user=user, **validated_data)
-
-
-class UserSerializer(serializers.ModelSerializer):
-    """Django 기본 User 모델 직렬화"""
-
-    class Meta:
-        model = User
-        fields = ["id", "username", "email", "date_joined", "last_login"]
-        read_only_fields = ["id", "date_joined", "last_login"]

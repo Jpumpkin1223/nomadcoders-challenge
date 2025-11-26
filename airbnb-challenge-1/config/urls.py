@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
 from tweets import views
 
@@ -32,16 +32,6 @@ urlpatterns = [
         views.TweetDetailAPIView.as_view(),
         name="api_tweet_detail",
     ),
-    path("api/v1/users", views.UserListAPIView.as_view(), name="api_user_list"),
-    path(
-        "api/v1/users/<int:pk>",
-        views.UserDetailAPIView.as_view(),
-        name="api_user_detail",
-    ),
-    path(
-        "api/v1/users/<int:pk>/tweets",
-        views.UserTweetsAPIView.as_view(),
-        name="api_user_tweet_list",
-    ),
+    path("", include("users.urls")),
     path("admin/", admin.site.urls),
 ]

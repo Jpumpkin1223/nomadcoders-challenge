@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
@@ -7,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Tweet
-from .serializers import TweetSerializer, UserSerializer
+from .serializers import TweetSerializer
 
 
 def tweet_list(request):
@@ -40,9 +39,7 @@ class TweetListCreateAPIView(APIView):
         serializer = TweetSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             tweet = serializer.save()
-            return Response(
-                TweetSerializer(tweet).data, status=status.HTTP_201_CREATED
-            )
+            return Response(TweetSerializer(tweet).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -67,9 +64,7 @@ class TweetDetailAPIView(APIView):
                 {"detail": "본인 트윗만 수정할 수 있습니다."},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        serializer = TweetSerializer(
-            tweet, data=request.data, context={"request": request}
-        )
+        serializer = TweetSerializer(tweet, data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -84,40 +79,3 @@ class TweetDetailAPIView(APIView):
             )
         tweet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class UserListAPIView(APIView):
-    """모든 사용자 목록"""
-
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class UserDetailAPIView(APIView):
-    """단일 사용자 정보"""
-
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        user = get_object_or_404(User, pk=pk)
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class UserTweetsAPIView(APIView):
-    """특정 사용자의 트윗 목록"""
-
-    authentication_classes = [SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        user = get_object_or_404(User, pk=pk)
-        tweets = Tweet.objects.filter(user=user)
-        serializer = TweetSerializer(tweets, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
