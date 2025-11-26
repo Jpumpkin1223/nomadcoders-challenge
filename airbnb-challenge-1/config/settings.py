@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 CUSTOM_APPS = [
     "common",
     "tweets",
+    "users",
 ]
 
 INSTALLED_APPS = CUSTOM_APPS + [
