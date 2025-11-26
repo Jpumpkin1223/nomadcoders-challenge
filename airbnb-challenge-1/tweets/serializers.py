@@ -54,3 +54,35 @@ class UserCreateSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password")
         validated_data.pop("password_confirm")
         return User.objects.create_user(password=password, **validated_data)
+
+
+class PasswordUpdateSerializer(serializers.Serializer):
+    """비밀번호 변경 Serializer"""
+
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    new_password_confirm = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_current_password(self, value):
+        user = self.context.get("user")
+        if not user.check_password(value):
+            raise serializers.ValidationError("현재 비밀번호가 일치하지 않습니다.")
+        return value
+
+    def validate(self, attrs):
+        if attrs["new_password"] != attrs["new_password_confirm"]:
+            raise serializers.ValidationError(
+                {"new_password_confirm": "새 비밀번호가 일치하지 않습니다."}
+            )
+        if attrs["new_password"] == attrs["current_password"]:
+            raise serializers.ValidationError(
+                {"new_password": "새 비밀번호는 기존 비밀번호와 달라야 합니다."}
+            )
+        return attrs
+
+    def save(self, **kwargs):
+        user = self.context.get("user")
+        new_password = self.validated_data["new_password"]
+        user.set_password(new_password)
+        user.save()
+        return user

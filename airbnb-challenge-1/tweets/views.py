@@ -7,7 +7,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Tweet
-from .serializers import TweetSerializer, UserCreateSerializer, UserSerializer
+from .serializers import (
+    PasswordUpdateSerializer,
+    TweetSerializer,
+    UserCreateSerializer,
+    UserSerializer,
+)
 
 
 def tweet_list(request):
@@ -132,3 +137,21 @@ class UserTweetsAPIView(APIView):
         tweets = Tweet.objects.filter(user=user)
         serializer = TweetSerializer(tweets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserPasswordUpdateAPIView(APIView):
+    """로그인 사용자의 비밀번호를 변경한다."""
+
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        serializer = PasswordUpdateSerializer(
+            data=request.data, context={"user": request.user}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"detail": "비밀번호가 변경되었습니다."}, status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
