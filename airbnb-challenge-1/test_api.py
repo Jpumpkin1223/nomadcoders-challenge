@@ -46,10 +46,20 @@ def create_test_data():
     print(f"  - Tweets: {Tweet.objects.count()}")
 
 
+def get_authenticated_client(user: User | None = None) -> APIClient:
+    """세션 없이 간편하게 인증된 APIClient를 반환"""
+    user = user or User.objects.first()
+    if not user:
+        raise AssertionError("인증할 유저가 없습니다.")
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
+
+
 def test_all_tweets_api():
     """모든 트윗 리스트 API 테스트"""
     print("\n=== 테스트 1: /api/v1/tweets ===")
-    client = APIClient()
+    client = get_authenticated_client()
     response = client.get("/api/v1/tweets")
 
     print(f"Status Code: {response.status_code}")
@@ -70,7 +80,7 @@ def test_user_tweets_api():
         print("테스트할 유저가 없습니다.")
         return
 
-    client = APIClient()
+    client = get_authenticated_client(user)
     response = client.get(f"/api/v1/users/{user.id}/tweets")
 
     print(f"User ID: {user.id}")
@@ -85,14 +95,14 @@ def test_user_tweets_api():
 def test_user_not_found():
     """존재하지 않는 유저 테스트"""
     print("\n=== 테스트 3: 존재하지 않는 유저 ===")
-    client = APIClient()
+    client = get_authenticated_client()
     response = client.get("/api/v1/users/99999/tweets")
 
     print(f"Status Code: {response.status_code}")
     print(f"Response: {json.dumps(response.json(), indent=2, ensure_ascii=False)}")
 
     assert response.status_code == 404, f"예상: 404, 실제: {response.status_code}"
-    assert "error" in response.json(), "에러 메시지가 포함되어야 합니다"
+    assert "detail" in response.json(), "에러 메시지가 포함되어야 합니다"
     print("✓ 테스트 통과!")
 
 
