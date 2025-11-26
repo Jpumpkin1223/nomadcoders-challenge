@@ -47,9 +47,7 @@ class TweetListCreateAPIView(APIView):
         serializer = TweetSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             tweet = serializer.save()
-            return Response(
-                TweetSerializer(tweet).data, status=status.HTTP_201_CREATED
-            )
+            return Response(TweetSerializer(tweet).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -74,9 +72,7 @@ class TweetDetailAPIView(APIView):
                 {"detail": "본인 트윗만 수정할 수 있습니다."},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        serializer = TweetSerializer(
-            tweet, data=request.data, context={"request": request}
-        )
+        serializer = TweetSerializer(tweet, data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -101,9 +97,7 @@ class UserListCreateAPIView(APIView):
 
     def get(self, request):
         if not request.user.is_authenticated:
-            return Response(
-                {"detail": "로그인이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED
-            )
+            return Response({"detail": "로그인이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED)
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -148,14 +142,10 @@ class UserPasswordUpdateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
-        serializer = PasswordUpdateSerializer(
-            data=request.data, context={"user": request.user}
-        )
+        serializer = PasswordUpdateSerializer(data=request.data, context={"user": request.user})
         if serializer.is_valid():
             serializer.save()
-            return Response(
-                {"detail": "비밀번호가 변경되었습니다."}, status=status.HTTP_200_OK
-            )
+            return Response({"detail": "비밀번호가 변경되었습니다."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
