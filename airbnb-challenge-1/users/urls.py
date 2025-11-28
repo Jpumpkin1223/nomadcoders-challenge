@@ -21,4 +21,3 @@ urlpatterns = [
     path("api/v1/users/login", UserLoginAPIView.as_view(), name="api_user_login"),
     path("api/v1/users/logout", UserLogoutAPIView.as_view(), name="api_user_logout"),
 ]
-
